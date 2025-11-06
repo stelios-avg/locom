@@ -1,0 +1,120 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous"
+  },
+  "auth": {
+    "login": "Sign In",
+    "signup": "Sign Up",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "signingIn": "Signing in...",
+    "creatingAccount": "Creating account...",
+    "dontHaveAccount": "Don't have an account?",
+    "alreadyHaveAccount": "Already have an account?",
+    "signUp": "Sign up",
+    "signIn": "Sign in",
+    "orContinueWith": "Or continue with",
+    "checkEmail": "Please check your email to confirm your account, then you can sign in.",
+    "accountCreated": "Account created! Please check your email to confirm your account, then you can sign in."
+  },
+  "nav": {
+    "feed": "Feed",
+    "marketplace": "Marketplace",
+    "events": "Events",
+    "profile": "Profile",
+    "admin": "Admin"
+  },
+  "feed": {
+    "title": "Neighborhood Feed",
+    "subtitle": "See what's happening in your area",
+    "newPost": "New Post",
+    "noPosts": "No posts found in your area",
+    "createFirstPost": "Create the first post!",
+    "loadingPosts": "Loading posts...",
+    "showPostsWithin": "Show posts within",
+    "km": "km"
+  },
+  "post": {
+    "create": "Create New Post",
+    "createListing": "Create New Listing",
+    "createEvent": "Create New Event",
+    "content": "Content",
+    "whatsOnMind": "What's on your mind?",
+    "posting": "Posting...",
+    "post": "Post",
+    "comments": "Comments",
+    "addComment": "Add a comment...",
+    "postComment": "Post Comment",
+    "noComments": "No comments yet",
+    "deletePost": "Are you sure you want to delete this post?",
+    "notFound": "Post not found"
+  },
+  "marketplace": {
+    "title": "Marketplace",
+    "subtitle": "Buy and sell in your neighborhood",
+    "newListing": "New Listing",
+    "price": "Price",
+    "category": "Category",
+    "selectCategory": "Select category",
+    "all": "All",
+    "furniture": "Furniture",
+    "electronics": "Electronics",
+    "clothing": "Clothing",
+    "books": "Books",
+    "services": "Services",
+    "other": "Other",
+    "noListings": "No listings found",
+    "loadingListings": "Loading listings..."
+  },
+  "events": {
+    "title": "Events",
+    "subtitle": "Discover local gatherings",
+    "createEvent": "Create Event",
+    "eventDate": "Event Date",
+    "eventLocation": "Event Location",
+    "venueName": "Venue name",
+    "all": "All",
+    "upcoming": "Upcoming",
+    "past": "Past",
+    "noEvents": "No events found",
+    "loadingEvents": "Loading events..."
+  },
+  "profile": {
+    "editProfile": "Edit Profile",
+    "bio": "Bio",
+    "neighborhood": "Neighborhood",
+    "avatar": "Avatar",
+    "uploadImage": "Upload image",
+    "removeImage": "Remove image",
+    "saveChanges": "Save Changes",
+    "posts": "Posts",
+    "noPosts": "No posts yet",
+    "notFound": "Profile not found"
+  },
+  "location": {
+    "useCurrentLocation": "Use Current Location",
+    "currentLocation": "Current location",
+    "locationRequired": "Could not get your location. Please enable location services."
+  },
+  "admin": {
+    "title": "Admin Panel",
+    "allPosts": "All Posts",
+    "noPosts": "No posts found",
+    "loadingPosts": "Loading posts..."
+  }
+}
+
+

@@ -1,0 +1,17 @@
+# Capacitor
+ios/
+android/
+.capacitor/
+
+# Native builds
+*.xcworkspace
+*.xcodeproj
+*.xcuserdata
+*.xcuserstate
+*.hmap
+*.ipa
+*.app.dSYM
+*.apk
+*.aab
+
+

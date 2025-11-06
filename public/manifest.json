@@ -1,0 +1,22 @@
+{
+  "name": "Locom - Local Community Platform",
+  "short_name": "Locom",
+  "description": "Connect with your neighborhood in Cyprus",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#16a34a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["social", "community"],
+  "screenshots": [],
+  "prefer_related_applications": false
+}
+
+

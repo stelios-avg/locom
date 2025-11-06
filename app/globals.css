@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900;
+    /* Improve mobile scrolling */
+    -webkit-overflow-scrolling: touch;
+    /* Prevent text size adjustment on iOS */
+    -webkit-text-size-adjust: 100%;
+  }
+  
+  /* Safe area for notch devices */
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* Better touch targets on mobile */
+  @media (max-width: 768px) {
+    button, a {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-2xl shadow-sm border border-gray-100 p-6;
+  }
+  
+  .btn-primary {
+    @apply bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white font-medium px-6 py-2.5 rounded-xl transition-colors duration-200 touch-manipulation;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary-100 hover:bg-secondary-200 active:bg-secondary-300 text-secondary-700 font-medium px-6 py-2.5 rounded-xl transition-colors duration-200 touch-manipulation;
+  }
+  
+  .btn-outline {
+    @apply border-2 border-gray-300 hover:border-gray-400 active:border-gray-500 text-gray-700 font-medium px-6 py-2.5 rounded-xl transition-colors duration-200 touch-manipulation;
+  }
+  
+  .input {
+    @apply w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+  }
+}
+
+/* Mobile-specific styles outside of @layer */
+@media (max-width: 768px) {
+  .btn-primary,
+  .btn-secondary,
+  .btn-outline {
+    @apply py-3;
+  }
+}
+
