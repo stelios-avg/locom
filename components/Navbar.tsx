@@ -7,6 +7,7 @@ import { Home, ShoppingBag, Calendar, User, Settings, LogOut } from 'lucide-reac
 import { useAuth } from '@/app/providers'
 import { useTranslations } from '@/lib/i18n/hooks'
 import LanguageSwitcher from './LanguageSwitcher'
+import NotificationBell from './NotificationBell'
 
 export default function Navbar() {
   const router = useRouter()
@@ -59,6 +60,7 @@ export default function Navbar() {
               <User className="w-5 h-5 flex-shrink-0" />
               <span className="hidden md:inline">{t?.nav.profile || 'Profile'}</span>
             </Link>
+            {user && <NotificationBell />}
             <LanguageSwitcher />
             {user && (
               <button

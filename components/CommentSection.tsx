@@ -6,6 +6,7 @@ import { CommentWithUser } from '@/types'
 import { formatDistanceToNow } from 'date-fns'
 import { Send } from 'lucide-react'
 import { useTranslations } from '@/lib/i18n/hooks'
+import { checkTextContent } from '@/lib/content-moderation'
 
 interface CommentSectionProps {
   postId: string
@@ -22,6 +23,17 @@ export default function CommentSection({ postId, comments, onCommentAdded }: Com
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newComment.trim()) return
+
+    // Validate comment content
+    const textCheck = checkTextContent(newComment)
+    if (!textCheck.isAppropriate) {
+      alert(
+        (textCheck.reason || 'Inappropriate content detected') + 
+        '\n\n' + 
+        (t?.post.contentModeration || 'Please review your content and try again.')
+      )
+      return
+    }
 
     setLoading(true)
     const { data: { user } } = await supabase.auth.getUser()

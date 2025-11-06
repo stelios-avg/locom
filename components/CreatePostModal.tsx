@@ -3,10 +3,11 @@
 import { useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { PostType } from '@/types'
-import { X, Image as ImageIcon, MapPin } from 'lucide-react'
+import { X, Image as ImageIcon, MapPin, AlertTriangle } from 'lucide-react'
 import { useDropzone } from 'react-dropzone'
 import { getCurrentLocation } from '@/utils/geolocation'
 import { useTranslations } from '@/lib/i18n/hooks'
+import { validatePostContent } from '@/lib/content-moderation'
 
 interface CreatePostModalProps {
   onClose: () => void
@@ -23,6 +24,7 @@ export default function CreatePostModal({ onClose, postType }: CreatePostModalPr
   const [eventDate, setEventDate] = useState('')
   const [eventLocation, setEventLocation] = useState('')
   const [loading, setLoading] = useState(false)
+  const [locationLoading, setLocationLoading] = useState(false)
   const supabase = createClient()
   const { t } = useTranslations()
 
@@ -42,6 +44,7 @@ export default function CreatePostModal({ onClose, postType }: CreatePostModalPr
   })
 
   const getCurrentLocationHandler = async () => {
+    setLocationLoading(true)
     try {
       const coords = await getCurrentLocation()
       setLocation({
@@ -50,13 +53,28 @@ export default function CreatePostModal({ onClose, postType }: CreatePostModalPr
         name: t?.location.currentLocation || 'Current location'
       })
     } catch (error) {
-      alert(t?.location.locationRequired || 'Could not get your location. Please enable location services.')
+      const errorMessage = error instanceof Error ? error.message : (t?.location.locationRequired || 'Could not get your location. Please enable location services.')
+      alert(errorMessage)
+      console.error('Location error:', error)
+    } finally {
+      setLocationLoading(false)
     }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!content.trim()) return
+
+    // Validate content before submission
+    const validation = validatePostContent(content, image)
+    if (!validation.isValid) {
+      alert(
+        validation.errors.join('\n') + 
+        '\n\n' + 
+        (t?.post.contentModeration || 'Please review your content and try again.')
+      )
+      return
+    }
 
     setLoading(true)
     const { data: { user } } = await supabase.auth.getUser()
@@ -84,7 +102,7 @@ export default function CreatePostModal({ onClose, postType }: CreatePostModalPr
       }
     }
 
-    // Create post
+    // Create post (status will be 'pending' by default, or 'approved' if auto-approve is enabled)
     const { error } = await supabase
       .from('posts')
       .insert({
@@ -99,6 +117,7 @@ export default function CreatePostModal({ onClose, postType }: CreatePostModalPr
         price: price ? parseFloat(price) : null,
         event_date: eventDate || null,
         event_location: eventLocation || null,
+        status: 'approved', // Auto-approve for now (can be changed to 'pending' for manual review)
       })
 
     if (!error) {
@@ -217,13 +236,29 @@ export default function CreatePostModal({ onClose, postType }: CreatePostModalPr
             <button
               type="button"
               onClick={getCurrentLocationHandler}
-              className="btn-secondary flex items-center gap-2 mb-2"
+              disabled={locationLoading}
+              className="btn-secondary flex items-center gap-2 mb-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <MapPin className="w-4 h-4" />
-                    {t?.location.useCurrentLocation || 'Use Current Location'}
+              {locationLoading ? (
+                <>
+                  <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                  <span>{t?.location.gettingLocation || 'Getting location...'}</span>
+                </>
+              ) : (
+                <span>{t?.location.useCurrentLocation || 'Use Current Location'}</span>
+              )}
             </button>
             {location && (
-              <p className="text-sm text-gray-600">{location.name}</p>
+              <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-sm text-green-700 flex items-center gap-2">
+                  <MapPin className="w-4 h-4" />
+                  <span>{location.name}</span>
+                </p>
+                <p className="text-xs text-green-600 mt-1">
+                  Lat: {location.lat.toFixed(6)}, Lng: {location.lng.toFixed(6)}
+                </p>
+              </div>
             )}
           </div>
 

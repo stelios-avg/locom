@@ -151,16 +151,16 @@ export async function loadTranslations(locale: Locale = getLocale()): Promise<Tr
   }
 
   try {
-    const module = await import(`@/locales/${locale}.json`)
-    translations = module.default as Translations
+    const translationModule = await import(`@/locales/${locale}.json`)
+    translations = translationModule.default as Translations
     currentLocale = locale
     return translations
   } catch (error) {
     console.error(`Failed to load translations for locale: ${locale}`, error)
     // Fallback to English
     if (locale !== 'en') {
-      const module = await import(`@/locales/en.json`)
-      translations = module.default as Translations
+      const fallbackModule = await import(`@/locales/en.json`)
+      translations = fallbackModule.default as Translations
       currentLocale = 'en'
       return translations
     }

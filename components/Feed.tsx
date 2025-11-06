@@ -60,7 +60,7 @@ export default function Feed() {
       const userLat = profile?.latitude || userLocation?.lat || 35.1856
       const userLng = profile?.longitude || userLocation?.lng || 33.3823
 
-      // Fetch posts with user profiles
+      // Fetch posts with user profiles (only approved posts, or pending/own posts)
       let query = supabase
         .from('posts')
         .select(`
@@ -73,6 +73,7 @@ export default function Feed() {
           )
         `)
         .eq('post_type', 'feed')
+        .or('status.is.null,status.eq.approved,user_id.eq.' + user.id)
         .order('created_at', { ascending: false })
         .limit(50)
 

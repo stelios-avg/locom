@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { PostWithUser, Profile } from '@/types'
 import Navbar from './Navbar'
-import { Trash2, Shield, AlertTriangle } from 'lucide-react'
+import { Trash2, Shield, AlertTriangle, CheckCircle, XCircle } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { useTranslations } from '@/lib/i18n/hooks'
+import { checkTextContent } from '@/lib/content-moderation'
 
 export default function AdminPanel() {
   const [posts, setPosts] = useState<PostWithUser[]>([])
@@ -82,6 +83,29 @@ export default function AdminPanel() {
     }
   }
 
+  const handleModeratePost = async (postId: string, status: 'approved' | 'rejected', reason?: string) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    const { error } = await supabase
+      .from('posts')
+      .update({
+        status,
+        moderation_notes: reason || null,
+        moderated_by: user.id,
+        moderated_at: new Date().toISOString(),
+      })
+      .eq('id', postId)
+
+    if (!error) {
+      loadPosts()
+    }
+  }
+
+  const checkPostContent = (post: PostWithUser) => {
+    return checkTextContent(post.content)
+  }
+
   return (
     <div>
       <Navbar />
@@ -141,6 +165,27 @@ export default function AdminPanel() {
                         <span className="text-xs font-medium px-2 py-1 bg-primary-100 text-primary-700 rounded">
                           {post.post_type}
                         </span>
+                        {(post as any).status && (
+                          <span className={`text-xs font-medium px-2 py-1 rounded ${
+                            (post as any).status === 'approved' ? 'bg-green-100 text-green-700' :
+                            (post as any).status === 'rejected' ? 'bg-red-100 text-red-700' :
+                            'bg-yellow-100 text-yellow-700'
+                          }`}>
+                            {(post as any).status}
+                          </span>
+                        )}
+                        {(() => {
+                          const contentCheck = checkPostContent(post)
+                          if (!contentCheck.isAppropriate) {
+                            return (
+                              <span className="text-xs font-medium px-2 py-1 bg-orange-100 text-orange-700 rounded flex items-center gap-1">
+                                <AlertTriangle className="w-3 h-3" />
+                                Flagged
+                              </span>
+                            )
+                          }
+                          return null
+                        })()}
                         <span className="text-sm text-gray-500">
                           {post.profiles?.name || 'Anonymous'}
                         </span>
@@ -149,17 +194,45 @@ export default function AdminPanel() {
                         </span>
                       </div>
                       <p className="text-gray-700 mb-1 line-clamp-2">{post.content}</p>
+                      {post.image_url && (
+                        <div className="mb-2">
+                          <img src={post.image_url} alt="Post" className="w-32 h-32 object-cover rounded-lg" />
+                        </div>
+                      )}
                       <div className="flex items-center gap-4 text-sm text-gray-500">
                         <span>{post.comments_count || 0} comments</span>
                       </div>
                     </div>
-                    <button
-                      onClick={() => handleDeletePost(post.id)}
-                      className="ml-4 text-red-600 hover:text-red-700 transition-colors"
-                      title="Delete post"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
+                    <div className="ml-4 flex items-center gap-2">
+                      {(post as any).status !== 'approved' && (
+                        <button
+                          onClick={() => handleModeratePost(post.id, 'approved')}
+                          className="text-green-600 hover:text-green-700 transition-colors"
+                          title="Approve post"
+                        >
+                          <CheckCircle className="w-5 h-5" />
+                        </button>
+                      )}
+                      {(post as any).status !== 'rejected' && (
+                        <button
+                          onClick={() => {
+                            const reason = prompt('Rejection reason (optional):')
+                            handleModeratePost(post.id, 'rejected', reason || undefined)
+                          }}
+                          className="text-red-600 hover:text-red-700 transition-colors"
+                          title="Reject post"
+                        >
+                          <XCircle className="w-5 h-5" />
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleDeletePost(post.id)}
+                        className="text-red-600 hover:text-red-700 transition-colors"
+                        title="Delete post"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

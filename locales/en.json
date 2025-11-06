@@ -60,7 +60,8 @@
     "postComment": "Post Comment",
     "noComments": "No comments yet",
     "deletePost": "Are you sure you want to delete this post?",
-    "notFound": "Post not found"
+    "notFound": "Post not found",
+    "contentModeration": "Your content does not meet our guidelines. Please remove any inappropriate language or content."
   },
   "marketplace": {
     "title": "Marketplace",
@@ -107,7 +108,8 @@
   "location": {
     "useCurrentLocation": "Use Current Location",
     "currentLocation": "Current location",
-    "locationRequired": "Could not get your location. Please enable location services."
+    "locationRequired": "Could not get your location. Please enable location services.",
+    "gettingLocation": "Getting location..."
   },
   "admin": {
     "title": "Admin Panel",

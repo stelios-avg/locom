@@ -34,7 +34,15 @@ export async function getCurrentLocation(): Promise<{
 }> {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
-      reject(new Error('Geolocation is not supported'))
+      reject(new Error('Geolocation is not supported by your browser'))
+      return
+    }
+
+    // Check if we're on HTTPS or localhost (required for geolocation)
+    const isSecure = window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.startsWith('192.168.')
+    
+    if (!isSecure) {
+      reject(new Error('Geolocation requires HTTPS. Please use HTTPS or localhost.'))
       return
     }
 
@@ -46,12 +54,29 @@ export async function getCurrentLocation(): Promise<{
         })
       },
       (error) => {
-        reject(error)
+        let errorMessage = 'Could not get your location'
+        
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = 'Location permission denied. Please enable location access in your browser settings.'
+            break
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = 'Location information is unavailable. Please check your device settings.'
+            break
+          case error.TIMEOUT:
+            errorMessage = 'Location request timed out. Please try again.'
+            break
+          default:
+            errorMessage = 'An unknown error occurred while getting your location.'
+            break
+        }
+        
+        reject(new Error(errorMessage))
       },
       {
         enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0,
+        timeout: 15000, // Increased timeout
+        maximumAge: 60000, // Accept cached location up to 1 minute old
       }
     )
   })
