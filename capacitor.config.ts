@@ -4,13 +4,14 @@ const config: CapacitorConfig = {
   appId: 'com.locom.app',
   appName: 'Locom',
   webDir: 'out',
-  server: {
-    androidScheme: 'https',
-    iosScheme: 'https',
-    // If you're using a custom domain, uncomment:
-    // url: 'https://your-domain.com',
-    // cleartext: false,
-  },
+  // Production: Remove server.url to use bundled web assets
+  // Development: Uncomment below to use live reload
+  // server: {
+  //   androidScheme: 'https',
+  //   iosScheme: 'https',
+  //   url: 'http://YOUR_IP:3000',
+  //   cleartext: true,
+  // },
   plugins: {
     SplashScreen: {
       launchShowDuration: 2000,

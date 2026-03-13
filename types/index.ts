@@ -4,6 +4,7 @@ export type Profile = Database['public']['Tables']['profiles']['Row']
 export type Post = Database['public']['Tables']['posts']['Row']
 export type Comment = Database['public']['Tables']['comments']['Row']
 export type Neighborhood = Database['public']['Tables']['neighborhoods']['Row']
+export type Subscription = Database['public']['Tables']['subscriptions']['Row']
 
 export type PostType = 'feed' | 'marketplace' | 'event'
 
@@ -14,5 +15,9 @@ export interface PostWithUser extends Post {
 
 export interface CommentWithUser extends Comment {
   profiles: Profile
+}
+
+export interface ProfileWithSubscription extends Profile {
+  subscriptions?: Subscription[]
 }
 

@@ -12,24 +12,57 @@ function AuthCallbackContent() {
   useEffect(() => {
     const handleCallback = async () => {
       const code = searchParams.get('code')
+      const type = searchParams.get('type') // 'signup', 'email', or 'recovery' for email confirmations
+      const errorParam = searchParams.get('error')
+      
+      // Check for OAuth errors
+      if (errorParam) {
+        console.error('OAuth error:', errorParam)
+        router.push('/auth/login?error=oauth_failed')
+        return
+      }
       
       if (code) {
         try {
-          const { error } = await supabase.auth.exchangeCodeForSession(code)
+          // Exchange code for session
+          const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+          
           if (error) {
             console.error('Error exchanging code:', error)
             router.push('/auth/login?error=callback_failed')
+            return
+          }
+          
+          if (type === 'recovery') {
+            // Password reset — keep session and redirect to reset page
+            router.push('/auth/reset-password')
+          } else if (type === 'signup' || type === 'email') {
+            // Email confirmation — sign out and redirect to login
+            await supabase.auth.signOut()
+            router.push('/auth/login?confirmed=true')
           } else {
-            router.push('/')
-            router.refresh()
+            // OAuth login - verify session and redirect
+            const { data: { session } } = await supabase.auth.getSession()
+            if (session) {
+              router.push('/')
+              router.refresh()
+            } else {
+              router.push('/auth/login?error=session_failed')
+            }
           }
         } catch (error) {
           console.error('Callback error:', error)
           router.push('/auth/login?error=callback_failed')
         }
       } else {
-        // No code, redirect to home
-        router.push('/')
+        // No code - might be OAuth redirect, check for session
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session) {
+          router.push('/')
+          router.refresh()
+        } else {
+          router.push('/auth/login')
+        }
       }
     }
 

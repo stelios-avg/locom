@@ -7,6 +7,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { Send } from 'lucide-react'
 import { useTranslations } from '@/lib/i18n/hooks'
 import { checkTextContent } from '@/lib/content-moderation'
+import ReportButton from './ReportButton'
 
 interface CommentSectionProps {
   postId: string
@@ -81,9 +82,17 @@ export default function CommentSection({ postId, comments, onCommentAdded }: Com
             )}
             <div className="flex-1">
               <div className="bg-gray-50 rounded-xl p-3">
-                <p className="font-medium text-sm text-gray-900 mb-1">
-                  {comment.profiles?.name || 'Anonymous'}
-                </p>
+                <div className="flex items-start justify-between mb-1">
+                  <p className="font-medium text-sm text-gray-900">
+                    {comment.profiles?.name || 'Anonymous'}
+                  </p>
+                  <ReportButton
+                    contentType="comment"
+                    contentId={comment.id}
+                    reportedUserId={comment.user_id}
+                    className="flex-shrink-0"
+                  />
+                </div>
                 <p className="text-sm text-gray-700">{comment.content}</p>
               </div>
               <p className="text-xs text-gray-500 mt-1">

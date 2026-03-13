@@ -53,34 +53,19 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
         .from('posts')
         .select(`
           *,
-          profiles:user_id (
-            id,
-            name,
-            avatar_url,
-            neighborhood
-          )
+          profiles:user_id (id, name, avatar_url, neighborhood, is_pro),
+          comments(count)
         `)
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
 
       if (error) throw error
 
-      const postsWithComments = await Promise.all(
-        (data || []).map(async (post) => {
-          const { count } = await supabase
-            .from('comments')
-            .select('*', { count: 'exact', head: true })
-            .eq('post_id', post.id)
-
-          return {
-            ...post,
-            profiles: post.profiles,
-            comments_count: count || 0,
-          }
-        })
-      )
-
-      setPosts(postsWithComments as PostWithUser[])
+      setPosts((data || []).map((post) => ({
+        ...post,
+        profiles: post.profiles,
+        comments_count: (post as any).comments?.[0]?.count || 0,
+      })) as PostWithUser[])
     } catch (error) {
       console.error('Error loading posts:', error)
     }

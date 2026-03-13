@@ -30,12 +30,8 @@ export default function Events() {
         .from('posts')
         .select(`
           *,
-          profiles:user_id (
-            id,
-            name,
-            avatar_url,
-            neighborhood
-          )
+          profiles:user_id (id, name, avatar_url, neighborhood, is_pro),
+          comments(count)
         `)
         .eq('post_type', 'event')
         .order('event_date', { ascending: true })
@@ -54,22 +50,11 @@ export default function Events() {
         )
       }
 
-      const eventsWithComments = await Promise.all(
-        filteredEvents.map(async (event) => {
-          const { count } = await supabase
-            .from('comments')
-            .select('*', { count: 'exact', head: true })
-            .eq('post_id', event.id)
-
-          return {
-            ...event,
-            profiles: event.profiles,
-            comments_count: count || 0,
-          }
-        })
-      )
-
-      setEvents(eventsWithComments as PostWithUser[])
+      setEvents(filteredEvents.map((event) => ({
+        ...event,
+        profiles: event.profiles,
+        comments_count: (event as any).comments?.[0]?.count || 0,
+      })) as PostWithUser[])
     } catch (error) {
       console.error('Error loading events:', error)
     } finally {

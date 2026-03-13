@@ -1,10 +1,15 @@
 /** @type {import('next').NextConfig} */
+
+const isMobileBuild = process.env.MOBILE_BUILD === '1'
+
 const nextConfig = {
-  // Static export for mobile apps (required for Capacitor)
-  output: 'export',
-  
+  // Static export only for mobile builds (required for Capacitor)
+  ...(isMobileBuild && {
+    output: 'export',
+    trailingSlash: true,
+  }),
+
   images: {
-    // Disable image optimization for static export
     unoptimized: true,
     domains: ['localhost'],
     remotePatterns: [
@@ -14,13 +19,20 @@ const nextConfig = {
       },
     ],
   },
-  
-  // Trailing slash for better compatibility
-  trailingSlash: true,
-  
-  // Disable features that don't work with static export
-  // Note: API routes and server components won't work
+
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      }
+    }
+    return config
+  },
+
+  pageExtensions: ['tsx', 'ts', 'jsx', 'js'],
 }
 
 module.exports = nextConfig
-

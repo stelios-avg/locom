@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Bell } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useTranslations } from '@/lib/i18n/hooks'
+import { getCurrentLocale } from '@/lib/i18n'
 
 interface Notification {
   id: string
@@ -20,6 +22,7 @@ export default function NotificationBell() {
   const [unreadCount, setUnreadCount] = useState(0)
   const [showDropdown, setShowDropdown] = useState(false)
   const supabase = createClient()
+  const router = useRouter()
   const { t } = useTranslations()
 
   useEffect(() => {
@@ -151,11 +154,12 @@ export default function NotificationBell() {
                       !notification.read ? 'bg-blue-50' : ''
                     }`}
                     onClick={() => {
-                      if (notification.post_id) {
-                        window.location.href = `/post?id=${notification.post_id}`
-                      }
                       if (!notification.read) {
                         markAsRead(notification.id)
+                      }
+                      if (notification.post_id) {
+                        setShowDropdown(false)
+                        router.push(`/post?id=${notification.post_id}`)
                       }
                     }}
                   >
@@ -171,12 +175,15 @@ export default function NotificationBell() {
                           {notification.message}
                         </p>
                         <p className="text-xs text-gray-400 mt-1">
-                          {new Date(notification.created_at).toLocaleString('el-GR', {
-                            day: 'numeric',
-                            month: 'short',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
+                          {new Date(notification.created_at).toLocaleString(
+                            getCurrentLocale() === 'el' ? 'el-GR' : 'en-GB',
+                            {
+                              day: 'numeric',
+                              month: 'short',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            }
+                          )}
                         </p>
                       </div>
                     </div>

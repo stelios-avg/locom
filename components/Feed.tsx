@@ -1,21 +1,29 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { PostWithUser } from '@/types'
 import PostCard from './PostCard'
 import CreatePostModal from './CreatePostModal'
 import Navbar from './Navbar'
-import { Plus, MapPin } from 'lucide-react'
+import { Plus, MapPin, AlertCircle, Search } from 'lucide-react'
 import { getCurrentLocation } from '@/utils/geolocation'
 import { useTranslations } from '@/lib/i18n/hooks'
 
+const PAGE_SIZE = 20
+
 export default function Feed() {
   const [posts, setPosts] = useState<PostWithUser[]>([])
+  const [allPosts, setAllPosts] = useState<PostWithUser[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
-  const [radius, setRadius] = useState(5) // Default 5km radius
+  const [radius, setRadius] = useState(5)
+  const [search, setSearch] = useState('')
+  const [page, setPage] = useState(1)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const supabase = createClient()
   const { t } = useTranslations()
 
@@ -24,10 +32,26 @@ export default function Feed() {
   }, [])
 
   useEffect(() => {
-    if (userLocation) {
+    if (!userLocation) return
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      setPage(1)
       loadPosts()
+    }, 300)
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
     }
   }, [radius, userLocation])
+
+  // Filter posts client-side when search changes
+  useEffect(() => {
+    if (!search.trim()) {
+      setPosts(allPosts.slice(0, page * PAGE_SIZE))
+    } else {
+      const q = search.toLowerCase()
+      setPosts(allPosts.filter(p => p.content.toLowerCase().includes(q)))
+    }
+  }, [search, allPosts])
 
   const getUserLocation = async () => {
     try {
@@ -43,6 +67,7 @@ export default function Feed() {
   const loadPosts = async () => {
     try {
       setLoading(true)
+      setError(null)
       
       // Get user's current location from profile
       const { data: { user } } = await supabase.auth.getUser()
@@ -60,71 +85,53 @@ export default function Feed() {
       const userLat = profile?.latitude || userLocation?.lat || 35.1856
       const userLng = profile?.longitude || userLocation?.lng || 33.3823
 
-      // Fetch posts with user profiles (only approved posts, or pending/own posts)
-      let query = supabase
+      // Get blocked users
+      const { data: blockedUsers } = await supabase
+        .from('user_blocks')
+        .select('blocked_id')
+        .eq('blocker_id', user.id)
+
+      const blockedIds = blockedUsers?.map(b => b.blocked_id) || []
+
+      const { data, error } = await supabase
         .from('posts')
         .select(`
           *,
-          profiles:user_id (
-            id,
-            name,
-            avatar_url,
-            neighborhood
-          )
+          profiles:user_id (id, name, avatar_url, neighborhood, is_pro),
+          comments(count)
         `)
         .eq('post_type', 'feed')
         .or('status.is.null,status.eq.approved,user_id.eq.' + user.id)
+        .is('hidden', null)
         .order('created_at', { ascending: false })
-        .limit(50)
-
-      const { data, error } = await query
+        .limit(200)
 
       if (error) throw error
 
-      // Filter posts by radius
-      if (data) {
-        // Filter posts: show posts without location OR posts within radius
-        const filteredPosts = data.filter((post) => {
-          // Always show posts without location
-          if (!post.latitude || !post.longitude) return true
-          
-          // If user location is available, filter by radius
-          if (userLat && userLng) {
-          const distance = calculateDistance(
-            userLat,
-            userLng,
-            post.latitude,
-            post.longitude
-          )
-            return distance <= radius
-          }
-          
-          // If no user location, show all posts with location
-          return true
-        })
+      const filteredByBlocks = (data || []).filter(
+        post => !blockedIds.includes(post.user_id) && !post.hidden
+      )
 
-        // Get comments count for each post
-        const postsWithComments = await Promise.all(
-          filteredPosts.map(async (post) => {
-            const { count } = await supabase
-              .from('comments')
-              .select('*', { count: 'exact', head: true })
-              .eq('post_id', post.id)
+      const filteredPosts = filteredByBlocks.filter((post) => {
+        if (!post.latitude || !post.longitude) return true
+        if (userLat && userLng) {
+          return calculateDistance(userLat, userLng, post.latitude, post.longitude) <= radius
+        }
+        return true
+      })
 
-            return {
-              ...post,
-              profiles: post.profiles,
-              comments_count: count || 0,
-            }
-          })
-        )
+      const postsWithComments = filteredPosts.map((post) => ({
+        ...post,
+        profiles: post.profiles,
+        comments_count: (post as any).comments?.[0]?.count || 0,
+      }))
 
-        setPosts(postsWithComments as PostWithUser[])
-      } else {
-        setPosts([])
-      }
+      setAllPosts(postsWithComments as PostWithUser[])
+      setPosts((postsWithComments as PostWithUser[]).slice(0, PAGE_SIZE))
+      setPage(1)
     } catch (error) {
       console.error('Error loading posts:', error)
+      setError('Could not load posts. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -164,6 +171,19 @@ export default function Feed() {
           </button>
         </div>
 
+        {/* Search */}
+        <div className="mb-4 relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search posts..."
+            className="input pl-10 w-full"
+          />
+        </div>
+
+        {/* Radius filter */}
         <div className="mb-6 card">
           <div className="flex items-center gap-4">
             <MapPin className="w-5 h-5 text-primary-600" />
@@ -193,6 +213,19 @@ export default function Feed() {
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
             <p className="mt-4 text-gray-600">{t?.feed.loadingPosts || 'Loading posts...'}</p>
           </div>
+        ) : error ? (
+          <div className="card flex items-center gap-3 text-red-700 bg-red-50 border border-red-200">
+            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+            <div className="flex-1">
+              <p className="font-medium">{error}</p>
+            </div>
+            <button
+              onClick={loadPosts}
+              className="text-sm text-red-600 hover:text-red-800 font-medium underline"
+            >
+              Retry
+            </button>
+          </div>
         ) : posts.length === 0 ? (
           <div className="card text-center py-12">
             <p className="text-gray-600 mb-4">{t?.feed.noPosts || 'No posts found in your area'}</p>
@@ -208,6 +241,21 @@ export default function Feed() {
             {posts.map((post) => (
               <PostCard key={post.id} post={post} onUpdate={loadPosts} />
             ))}
+            {!search && allPosts.length > page * PAGE_SIZE && (
+              <div className="text-center pt-2">
+                <button
+                  onClick={() => {
+                    const nextPage = page + 1
+                    setPage(nextPage)
+                    setPosts(allPosts.slice(0, nextPage * PAGE_SIZE))
+                  }}
+                  disabled={loadingMore}
+                  className="btn-outline"
+                >
+                  Load More
+                </button>
+              </div>
+            )}
           </div>
         )}
 

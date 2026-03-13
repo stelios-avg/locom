@@ -22,9 +22,17 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
-      setLoading(false)
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser()
+        if (error) {
+          console.error('Error getting user:', error)
+        }
+        setUser(user)
+        setLoading(false)
+      } catch (error) {
+        console.error('Error in getUser:', error)
+        setLoading(false)
+      }
     }
 
     getUser()
@@ -36,7 +44,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
       }
     )
 
-    return () => subscription.unsubscribe()
+    return () => {
+      subscription?.unsubscribe()
+    }
   }, [supabase])
 
   return (

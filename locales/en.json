@@ -28,14 +28,17 @@
     "signIn": "Sign in",
     "orContinueWith": "Or continue with",
     "checkEmail": "Please check your email to confirm your account, then you can sign in.",
-    "accountCreated": "Account created! Please check your email to confirm your account, then you can sign in."
+    "accountCreated": "Account created! Please check your email to confirm your account, then you can sign in.",
+    "emailConfirmed": "Email confirmed successfully! Please sign in with your email and password."
   },
   "nav": {
     "feed": "Feed",
     "marketplace": "Marketplace",
     "events": "Events",
     "profile": "Profile",
-    "admin": "Admin"
+    "admin": "Admin",
+    "rules": "Rules",
+    "billing": "Billing"
   },
   "feed": {
     "title": "Neighborhood Feed",
@@ -115,7 +118,115 @@
     "title": "Admin Panel",
     "allPosts": "All Posts",
     "noPosts": "No posts found",
-    "loadingPosts": "Loading posts..."
+    "loadingPosts": "Loading posts...",
+    "reports": "Reports",
+    "noReports": "No reports found",
+    "loadingReports": "Loading reports...",
+    "reportedBy": "Reported by",
+    "reportedUser": "Reported User",
+    "contentType": "Content Type",
+    "reason": "Reason",
+    "description": "Description",
+    "status": "Status",
+    "pending": "Pending",
+    "reviewed": "Reviewed",
+    "resolved": "Resolved",
+    "dismissed": "Dismissed",
+    "actions": "Actions",
+    "hideContent": "Hide Content",
+    "deleteContent": "Delete Content",
+    "warnUser": "Warn User",
+    "banUser": "Ban User",
+    "dismissReport": "Dismiss Report",
+    "warnings": "Warnings",
+    "noWarnings": "No warnings found"
+  },
+  "report": {
+    "report": "Report",
+    "reportContent": "Report Content",
+    "selectReason": "Select a reason",
+    "spam": "Spam",
+    "inappropriate": "Inappropriate Content",
+    "harassment": "Harassment",
+    "fake": "Fake/False Information",
+    "scam": "Scam/Fraud",
+    "copyright": "Copyright Violation",
+    "other": "Other",
+    "additionalDetails": "Additional details (optional)",
+    "submitReport": "Submit Report",
+    "reportSubmitted": "Report submitted successfully",
+    "alreadyReported": "You have already reported this content"
+  },
+  "rules": {
+    "title": "Rules & Terms of Service",
+    "communityRules": "Community Rules",
+    "marketplaceRules": "Marketplace Rules",
+    "termsOfService": "Terms of Service",
+    "allowed": "Allowed",
+    "notAllowed": "Not Allowed",
+    "communityAllowed": [
+      "Sharing local news and updates",
+      "Asking for recommendations",
+      "Organizing community events",
+      "Sharing helpful information",
+      "Respectful discussions"
+    ],
+    "communityNotAllowed": [
+      "Hate speech or discrimination",
+      "Harassment or bullying",
+      "Spam or repetitive content",
+      "False information",
+      "Inappropriate images"
+    ],
+    "marketplaceAllowed": [
+      "Selling personal items",
+      "Offering services",
+      "Buying items from neighbors",
+      "Fair pricing",
+      "Accurate descriptions"
+    ],
+    "marketplaceNotAllowed": [
+      "Illegal items or services",
+      "Scams or fraud",
+      "Counterfeit goods",
+      "Misleading descriptions",
+      "Price gouging"
+    ]
+  },
+  "block": {
+    "blockUser": "Block User",
+    "unblockUser": "Unblock User",
+    "muteUser": "Mute User",
+    "hideFromUser": "Hide content from this user",
+    "userBlocked": "User blocked",
+    "userUnblocked": "User unblocked",
+    "confirmBlock": "Are you sure you want to block this user?",
+    "confirmUnblock": "Are you sure you want to unblock this user?"
+  },
+  "billing": {
+    "title": "Billing",
+    "loadError": "Could not load billing information",
+    "planPro": "Locom Pro",
+    "planFree": "Locom Free",
+    "onPro": "You are on Locom Pro",
+    "statusLabel": "Status",
+    "nextBilling": "Renews",
+    "manageInfo": "Manage your subscription from your Stripe customer portal (coming soon).",
+    "upgradeHeadline": "Upgrade to Locom Pro",
+    "upgradeDescription": "Unlock premium placement in the marketplace, get highlighted badges, and reach more local customers.",
+    "upgradeButton": "Upgrade to Locom Pro",
+    "checkoutError": "Unable to start checkout. Please try again later.",
+    "benefits": [
+      "Priority placement in marketplace results",
+      "Pro badge on your profile and listings",
+      "Unlimited promotional posts each month"
+    ],
+    "successTitle": "Subscription activated",
+    "successMessage": "You're now a Locom Pro member! Your benefits are live.",
+    "backToBilling": "Back to billing",
+    "cancelTitle": "Checkout canceled",
+    "cancelMessage": "No worries—your current plan remains active. You can upgrade anytime.",
+    "cancelButton": "Manage / Cancel Subscription"
   }
 }
 

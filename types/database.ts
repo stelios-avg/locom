@@ -14,11 +14,17 @@ export interface Database {
           id: string
           user_id: string
           name: string | null
+          email: string | null
+          full_name: string | null
           bio: string | null
           avatar_url: string | null
           neighborhood: string | null
           latitude: number | null
           longitude: number | null
+          plan: string
+          is_pro: boolean
+          is_admin: boolean
+          stripe_customer_id: string | null
           created_at: string
           updated_at: string
         }
@@ -26,11 +32,17 @@ export interface Database {
           id?: string
           user_id: string
           name?: string | null
+          email?: string | null
+          full_name?: string | null
           bio?: string | null
           avatar_url?: string | null
           neighborhood?: string | null
           latitude?: number | null
           longitude?: number | null
+          plan?: string
+          is_pro?: boolean
+          is_admin?: boolean
+          stripe_customer_id?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -38,11 +50,17 @@ export interface Database {
           id?: string
           user_id?: string
           name?: string | null
+          email?: string | null
+          full_name?: string | null
           bio?: string | null
           avatar_url?: string | null
           neighborhood?: string | null
           latitude?: number | null
           longitude?: number | null
+          plan?: string
+          is_pro?: boolean
+          is_admin?: boolean
+          stripe_customer_id?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -61,6 +79,11 @@ export interface Database {
           price: number | null
           event_date: string | null
           event_location: string | null
+          status: string | null
+          hidden: boolean | null
+          moderation_notes: string | null
+          moderated_by: string | null
+          moderated_at: string | null
           created_at: string
           updated_at: string
         }
@@ -77,6 +100,8 @@ export interface Database {
           price?: number | null
           event_date?: string | null
           event_location?: string | null
+          status?: string | null
+          hidden?: boolean | null
           created_at?: string
           updated_at?: string
         }
@@ -93,6 +118,8 @@ export interface Database {
           price?: number | null
           event_date?: string | null
           event_location?: string | null
+          status?: string | null
+          hidden?: boolean | null
           created_at?: string
           updated_at?: string
         }
@@ -147,6 +174,35 @@ export interface Database {
           latitude?: number
           longitude?: number
           created_at?: string
+        }
+      }
+      subscriptions: {
+        Row: {
+          id: string
+          user_id: string
+          stripe_subscription_id: string
+          status: string
+          current_period_end: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          stripe_subscription_id: string
+          status: string
+          current_period_end?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          stripe_subscription_id?: string
+          status?: string
+          current_period_end?: string | null
+          created_at?: string
+          updated_at?: string
         }
       }
     }

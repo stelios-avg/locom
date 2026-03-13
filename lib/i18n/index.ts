@@ -36,6 +36,7 @@ export interface Translations {
     orContinueWith: string
     checkEmail: string
     accountCreated: string
+    emailConfirmed: string
   }
   nav: {
     feed: string
@@ -43,6 +44,8 @@ export interface Translations {
     events: string
     profile: string
     admin: string
+    rules: string
+    billing: string
   }
   feed: {
     title: string
@@ -68,6 +71,7 @@ export interface Translations {
     noComments: string
     deletePost: string
     notFound: string
+    contentModeration: string
   }
   marketplace: {
     title: string
@@ -115,12 +119,93 @@ export interface Translations {
     useCurrentLocation: string
     currentLocation: string
     locationRequired: string
+    gettingLocation: string
   }
   admin: {
     title: string
     allPosts: string
     noPosts: string
     loadingPosts: string
+    reports: string
+    noReports: string
+    loadingReports: string
+    reportedBy: string
+    reportedUser: string
+    contentType: string
+    reason: string
+    description: string
+    status: string
+    pending: string
+    reviewed: string
+    resolved: string
+    dismissed: string
+    actions: string
+    hideContent: string
+    deleteContent: string
+    warnUser: string
+    banUser: string
+    dismissReport: string
+    warnings: string
+    noWarnings: string
+  }
+  report: {
+    report: string
+    reportContent: string
+    selectReason: string
+    spam: string
+    inappropriate: string
+    harassment: string
+    fake: string
+    scam: string
+    copyright: string
+    other: string
+    additionalDetails: string
+    submitReport: string
+    reportSubmitted: string
+    alreadyReported: string
+  }
+  rules: {
+    title: string
+    communityRules: string
+    marketplaceRules: string
+    termsOfService: string
+    allowed: string
+    notAllowed: string
+    communityAllowed: string[]
+    communityNotAllowed: string[]
+    marketplaceAllowed: string[]
+    marketplaceNotAllowed: string[]
+  }
+  block: {
+    blockUser: string
+    unblockUser: string
+    muteUser: string
+    hideFromUser: string
+    userBlocked: string
+    userUnblocked: string
+    confirmBlock: string
+    confirmUnblock: string
+  }
+  billing: {
+    title: string
+    loadError: string
+    planPro: string
+    planFree: string
+    onPro: string
+    statusLabel: string
+    nextBilling: string
+    manageInfo: string
+    upgradeHeadline: string
+    upgradeDescription: string
+    upgradeButton: string
+    checkoutError: string
+    benefits: string[]
+    successTitle: string
+    successMessage: string
+    backToBilling: string
+    cancelTitle: string
+    cancelMessage: string
+    cancelButton: string
   }
 }
 

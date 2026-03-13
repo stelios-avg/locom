@@ -1,3 +1,4 @@
+// @ts-nocheck - API routes are not used in mobile static export
 import { NextResponse } from 'next/server'
 import { parseRSSFeed, parseJSONFeed, parseNicosiaHTML, createMunicipalityPost, postExists } from '@/lib/municipality-sync'
 

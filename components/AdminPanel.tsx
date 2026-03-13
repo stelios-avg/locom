@@ -8,17 +8,20 @@ import { Trash2, Shield, AlertTriangle, CheckCircle, XCircle } from 'lucide-reac
 import { formatDistanceToNow } from 'date-fns'
 import { useTranslations } from '@/lib/i18n/hooks'
 import { checkTextContent } from '@/lib/content-moderation'
+import ReportsPanel from './ReportsPanel'
 
 export default function AdminPanel() {
   const [posts, setPosts] = useState<PostWithUser[]>([])
   const [loading, setLoading] = useState(true)
-  const [selectedTab, setSelectedTab] = useState<'posts' | 'users'>('posts')
+  const [selectedTab, setSelectedTab] = useState<'posts' | 'reports' | 'users'>('posts')
   const supabase = createClient()
   const { t } = useTranslations()
 
   useEffect(() => {
     if (selectedTab === 'posts') {
       loadPosts()
+    } else if (selectedTab === 'reports') {
+      // ReportsPanel handles its own loading
     } else {
       loadUsers()
     }
@@ -31,33 +34,19 @@ export default function AdminPanel() {
         .from('posts')
         .select(`
           *,
-          profiles:user_id (
-            id,
-            name,
-            avatar_url
-          )
+          profiles:user_id (id, name, avatar_url, is_pro),
+          comments(count)
         `)
         .order('created_at', { ascending: false })
         .limit(100)
 
       if (error) throw error
 
-      const postsWithComments = await Promise.all(
-        (data || []).map(async (post) => {
-          const { count } = await supabase
-            .from('comments')
-            .select('*', { count: 'exact', head: true })
-            .eq('post_id', post.id)
-
-          return {
-            ...post,
-            profiles: post.profiles,
-            comments_count: count || 0,
-          }
-        })
-      )
-
-      setPosts(postsWithComments as PostWithUser[])
+      setPosts((data || []).map((post) => ({
+        ...post,
+        profiles: post.profiles,
+        comments_count: (post as any).comments?.[0]?.count || 0,
+      })) as PostWithUser[])
     } catch (error) {
       console.error('Error loading posts:', error)
     } finally {
@@ -128,6 +117,16 @@ export default function AdminPanel() {
               }`}
             >
               {t?.admin.allPosts || 'Posts'}
+            </button>
+            <button
+              onClick={() => setSelectedTab('reports')}
+              className={`px-4 py-2 font-medium transition-colors border-b-2 ${
+                selectedTab === 'reports'
+                  ? 'border-primary-600 text-primary-600'
+                  : 'border-transparent text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              {t?.admin.reports || 'Reports'}
             </button>
             <button
               onClick={() => setSelectedTab('users')}
@@ -239,6 +238,8 @@ export default function AdminPanel() {
             )}
           </div>
         )}
+
+        {selectedTab === 'reports' && <ReportsPanel />}
 
         {selectedTab === 'users' && (
           <div className="card">
