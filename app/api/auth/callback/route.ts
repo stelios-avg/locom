@@ -27,7 +27,11 @@ export async function GET(request: NextRequest) {
       }
       return NextResponse.redirect(new URL(next, requestUrl.origin))
     }
+
+    console.error('[OAuth Callback] exchangeCodeForSession error:', error)
+    const msg = encodeURIComponent(error.message)
+    return NextResponse.redirect(new URL(`/auth/login?error=${msg}`, requestUrl.origin))
   }
 
-  return NextResponse.redirect(new URL('/auth/login?error=callback_failed', requestUrl.origin))
+  return NextResponse.redirect(new URL('/auth/login?error=no_code_in_callback', requestUrl.origin))
 }

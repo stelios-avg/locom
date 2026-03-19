@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { Mail, Lock, AlertCircle, CheckCircle } from 'lucide-react'
+import { Mail, Lock, AlertCircle, CheckCircle, UserX } from 'lucide-react'
 import { useTranslations } from '@/lib/i18n/hooks'
 
 export default function LoginForm() {
@@ -32,15 +32,8 @@ export default function LoginForm() {
     // Check for OAuth errors
     const errorParam = searchParams.get('error')
     if (errorParam) {
-      let errorMessage = 'Authentication failed. Please try again.'
-      if (errorParam === 'oauth_failed') {
-        errorMessage = 'Google sign in failed. Please try again.'
-      } else if (errorParam === 'callback_failed') {
-        errorMessage = 'Authentication callback failed. Please try again.'
-      } else if (errorParam === 'session_failed') {
-        errorMessage = 'Session creation failed. Please try again.'
-      }
-      setError(errorMessage)
+      // Show the raw error message so we can debug exactly what's failing
+      setError(`Login error: ${decodeURIComponent(errorParam)}`)
       router.replace('/auth/login', { scroll: false })
     }
   }, [searchParams, router, t])
@@ -94,6 +87,20 @@ export default function LoginForm() {
       setSuccess('Check your email for a password reset link.')
       setShowForgotPassword(false)
       setResetEmail('')
+    }
+  }
+
+  const handleGuestLogin = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const { error } = await supabase.auth.signInAnonymously()
+      if (error) throw error
+      router.push('/')
+      router.refresh()
+    } catch (err: any) {
+      setError(err.message || 'Guest login failed. Please try again.')
+      setLoading(false)
     }
   }
 
@@ -256,6 +263,25 @@ export default function LoginForm() {
               <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
             </svg>
             Google
+          </button>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-400">or</span>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleGuestLogin}
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-xl border border-dashed border-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <UserX className="w-4 h-4" />
+            Continue as Guest
           </button>
 
           <p className="text-center text-sm text-gray-600">

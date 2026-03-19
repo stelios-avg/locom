@@ -255,6 +255,11 @@ export async function loadTranslations(locale: Locale = getLocale()): Promise<Tr
 
 // Hook is exported from hooks.ts for client components
 
+// Returns the currently loaded locale (defaults to 'el')
+export function getCurrentLocale(): Locale {
+  return currentLocale
+}
+
 // For server/client components that need translations
 export async function getTranslations(locale: Locale = 'el'): Promise<Translations> {
   return loadTranslations(locale)
