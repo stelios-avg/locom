@@ -37,6 +37,8 @@ export interface Translations {
     checkEmail: string
     accountCreated: string
     emailConfirmed: string
+    loginWithGoogle: string
+    loginWithFacebook: string
   }
   nav: {
     feed: string

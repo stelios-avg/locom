@@ -29,7 +29,9 @@
     "orContinueWith": "Or continue with",
     "checkEmail": "Please check your email to confirm your account, then you can sign in.",
     "accountCreated": "Account created! Please check your email to confirm your account, then you can sign in.",
-    "emailConfirmed": "Email confirmed successfully! Please sign in with your email and password."
+    "emailConfirmed": "Email confirmed successfully! Please sign in with your email and password.",
+    "loginWithGoogle": "Google",
+    "loginWithFacebook": "Facebook"
   },
   "nav": {
     "feed": "Feed",
