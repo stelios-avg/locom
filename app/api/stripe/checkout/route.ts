@@ -1,6 +1,13 @@
 import { NextResponse } from 'next/server'
+import type { User } from '@supabase/supabase-js'
+import type { Database } from '@/types/database'
 import { getStripe } from '@/lib/stripe/client'
 import { createAdminClient } from '@/lib/supabase/admin'
+
+type ProfileCheckout = Pick<
+  Database['public']['Tables']['profiles']['Row'],
+  'user_id' | 'name' | 'full_name' | 'email' | 'stripe_customer_id'
+>
 
 interface CheckoutRequestBody {
   userId: string
@@ -38,22 +45,29 @@ export async function POST(request: Request) {
       throw profileError
     }
 
+    const profileRow = profile as ProfileCheckout | null
+
     const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId)
 
-    if (userError || !userData?.user) {
-      throw userError ?? new Error('User not found')
+    if (userError) {
+      throw userError
     }
 
-    const userEmail = userData.user.email ?? profile?.email ?? undefined
+    const authUser = userData?.user as User | undefined
+    if (!authUser) {
+      throw new Error('User not found')
+    }
 
-    let profileRecord = profile
+    const userEmail = authUser.email ?? profileRow?.email ?? undefined
+
+    let profileRecord = profileRow
 
     if (!profileRecord) {
       const { data: newProfile, error: createProfileError } = await supabaseAdmin
         .from('profiles')
         .insert({
           user_id: userId,
-          name: userData.user.user_metadata?.name ?? userEmail ?? null,
+          name: authUser.user_metadata?.name ?? userEmail ?? null,
           email: userEmail ?? null,
         })
         .select('user_id, name, full_name, email, stripe_customer_id')
