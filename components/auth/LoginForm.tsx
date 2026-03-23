@@ -75,18 +75,32 @@ export default function LoginForm() {
     setResetLoading(true)
     setError(null)
 
-    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-      redirectTo: `${window.location.origin}/auth/reset-password`,
-    })
+    try {
+      // Use same-origin API so Supabase is called from the server (avoids ad blockers / "Failed to fetch" to *.supabase.co)
+      const res = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: resetEmail.trim() }),
+      })
 
-    setResetLoading(false)
+      const data = await res.json().catch(() => ({}))
 
-    if (error) {
-      setError(error.message)
-    } else {
+      if (!res.ok) {
+        setError(typeof data.error === 'string' ? data.error : 'Could not send reset email. Try again.')
+        setResetLoading(false)
+        return
+      }
+
       setSuccess('Check your email for a password reset link.')
       setShowForgotPassword(false)
       setResetEmail('')
+    } catch (err) {
+      console.error('Forgot password:', err)
+      setError(
+        'Network error. Check your connection, or try disabling ad blockers for this site.'
+      )
+    } finally {
+      setResetLoading(false)
     }
   }
 
