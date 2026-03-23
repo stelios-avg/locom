@@ -130,6 +130,7 @@ export interface Database {
           post_id: string
           user_id: string
           content: string
+          hidden?: boolean | null
           created_at: string
           updated_at: string
         }
@@ -138,6 +139,7 @@ export interface Database {
           post_id: string
           user_id: string
           content: string
+          hidden?: boolean | null
           created_at?: string
           updated_at?: string
         }
@@ -146,6 +148,7 @@ export interface Database {
           post_id?: string
           user_id?: string
           content?: string
+          hidden?: boolean | null
           created_at?: string
           updated_at?: string
         }
